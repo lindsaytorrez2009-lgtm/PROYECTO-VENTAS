@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+
+# Entorno virtual
+venv/
+env/
+
+# Variables privadas
+.env
+
+# VS Code
+.vscode/
+
+# Archivos temporales
+*.log
+*.tmp
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Flask
+instance/
+.webassets-cache
+
+# MySQL
+*.sql
+
+# Archivos grandes o basura
+node_modules/
+dist/
+build/
