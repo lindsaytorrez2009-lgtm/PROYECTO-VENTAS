@@ -158,10 +158,10 @@ def ver_productos():
         cursor.execute(sql)
 
     productos = cursor.fetchall()
-
     return render_template(
         "ver_productos.html",
         productos=productos,
         buscar=buscar
     )
-app.run(debug=True)
+if __name__=="__main__":
+    app.run(debug=True)
