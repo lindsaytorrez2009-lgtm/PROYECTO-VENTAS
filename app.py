@@ -16,7 +16,6 @@ os.makedirs(CARPETA, exist_ok=True)
 
 @app.route("/")
 def inicio():
-
     if "correo" not in session:
         return redirect("/login")
 
@@ -25,14 +24,12 @@ def inicio():
 
 @app.route("/guardar", methods=["POST"])
 def guardar():
-
     if "correo" not in session:
         return redirect("/login")
 
     nombre = request.form["nombre"]
     precio = request.form["precio"]
     stock = request.form["stock"]
-
     imagen = request.files["imagen"]
 
     nombre_imagen = ""
@@ -59,9 +56,7 @@ def guardar():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-
     if request.method == "POST":
-
         correo = request.form["correo"]
         clave = request.form["clave"]
 
@@ -71,27 +66,21 @@ def login():
         """
 
         valores = (correo,)
-
         cursor.execute(sql, valores)
-
         usuario_encontrado = cursor.fetchone()
 
         if usuario_encontrado:
-
             clave_bd = usuario_encontrado[2]
 
             if check_password_hash(clave_bd, clave):
-
                 session["id_usuario"] = usuario_encontrado[0]
                 session["correo"] = usuario_encontrado[1]
                 session["rol"] = usuario_encontrado[3]
 
                 flash("Bienvenido al sistema")
-
                 return redirect("/")
 
         flash("Correo o contraseña incorrectos")
-
         return redirect("/login")
 
     return render_template("login.html")
@@ -99,18 +88,23 @@ def login():
 
 @app.route("/logout")
 def logout():
-
     session.clear()
-
     flash("Sesión cerrada correctamente")
-
     return redirect("/login")
 
 
+# 🟢 CORREGIDO: Protección contra 'Duplicate entry' de MySQL
 @app.route("/crear-admin")
 def crear_admin():
-
     correo = "admin@gmail.com"
+    
+    # Validamos primero si ya existe para evitar errores de integridad
+    cursor.execute("SELECT * FROM usuarios WHERE correo = %s", (correo,))
+    existe = cursor.fetchone()
+    
+    if existe:
+        return "El administrador ya existe en el sistema. Puedes ir a /login directamente."
+
     clave = generate_password_hash("123456")
     rol = "Administrador"
 
@@ -121,14 +115,16 @@ def crear_admin():
 
     valores = (correo, clave, rol)
 
-    cursor.execute(sql, valores)
-    conexion.commit()
+    try:
+        cursor.execute(sql, valores)
+        conexion.commit()
+        return "Administrador creado correctamente"
+    except Exception as e:
+        return f"Error al crear administrador: {str(e)}"
 
-    return "Administrador creado correctamente"
 
 @app.route("/registrar-producto")
 def registrar_producto():
-
     if "correo" not in session:
         return redirect("/login")
 
@@ -137,7 +133,6 @@ def registrar_producto():
 
 @app.route("/ver-productos")
 def ver_productos():
-
     if "correo" not in session:
         return redirect("/login")
 
@@ -148,11 +143,8 @@ def ver_productos():
         SELECT * FROM productos
         WHERE nombre LIKE %s
         """
-
         valores = ("%" + buscar + "%",)
-
         cursor.execute(sql, valores)
-
     else:
         sql = "SELECT * FROM productos"
         cursor.execute(sql)
@@ -163,15 +155,16 @@ def ver_productos():
         productos=productos,
         buscar=buscar
     )
-# ========== AGREGAR ESTAS RUTAS NUEVAS ==========
+
 
 @app.route("/registro", methods=["GET"])
 def registro_form():
     return render_template("registro.html")
 
+
+# 🟢 CORREGIDO: Ajuste de estructura SQL para coincidir con la Base de Datos
 @app.route("/registro", methods=["POST"])
 def registro():
-    nombre = request.form.get("nombre")
     correo = request.form.get("correo")
     clave = request.form.get("clave")
     
@@ -186,13 +179,13 @@ def registro():
     # Encriptar contraseña
     clave_encriptada = generate_password_hash(clave)
     
-    # Insertar nuevo usuario
+    # Quitamos la columna 'nombre' para que la consulta no falle
     sql = """
-    INSERT INTO usuarios(correo, clave, rol, nombre)
-    VALUES(%s, %s, %s, %s)
+    INSERT INTO usuarios(correo, clave, rol)
+    VALUES(%s, %s, %s)
     """
     
-    valores = (correo, clave_encriptada, "Cliente", nombre)
+    valores = (correo, clave_encriptada, "Cliente")
     
     try:
         cursor.execute(sql, valores)
@@ -202,8 +195,6 @@ def registro():
     except Exception as e:
         flash(f"Error al registrar: {str(e)}")
         return redirect("/registro")
-
-# ========== FIN DEL CÓDIGO AGREGADO ==========
 
 
 if __name__=="__main__":
