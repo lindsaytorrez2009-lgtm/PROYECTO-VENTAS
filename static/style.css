@@ -175,3 +175,22 @@ p {
         font-size: 24px;
     }
 }
+
+
+/* --- ESTILO PARA EL LOGO REDONDO DEL FORMULARIO --- */
+.form-logo-real {
+    height: 100px;           /* Tamaño grandecito para que se note */
+    width: 100px;
+    border-radius: 50%;      /* Esto lo hace un círculo perfecto */
+    background-color: #fff;  /* Fondo blanco para que el logo resalte */
+    border: 3px solid #d4af37; /* Borde dorado notorio */
+    object-fit: cover;       /* Evita que la imagen se estire feo */
+    display: block;
+    margin: 0 auto 20px auto; /* Lo centra y le da espacio abajo */
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); /* Destello dorado chido */
+    transition: transform 0.3s ease;
+}
+
+.form-logo-real:hover {
+    transform: scale(1.1);   /* Se agranda un poquito al pasar el mouse */
+}
