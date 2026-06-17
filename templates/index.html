@@ -204,11 +204,14 @@
 </head>
 <body>
 
+
+
+    
+
     <!-- BARRA DE NAVEGACIÓN -->
-    <header>
+   <header>
         <a href="/" class="brand-nav">
-            <!-- Logo pequeño redondo en el menú -->
-            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Elegance" class="logo-mini">
+            <img src="{{ url_for('static', filename='uploads/logo.jpg') }}" alt="Elegance" class="logo-mini">
             <span class="logo-text">Elegancia Boutique</span>
         </a>
         <div class="user-info">
@@ -216,18 +219,15 @@
         </div>
     </header>
 
-    <!-- CONTENIDO CENTRAL -->
     <main class="main-container">
         
-        <!-- 🌟 El Logo principal súper visible, gigante y redondo 🌟 -->
         <div class="logo-central-container">
-            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Logo Premium" class="logo-grande">
+            <img src="{{ url_for('static', filename='uploads/logo.jpg') }}" alt="Logo Premium" class="logo-grande">
         </div>
 
         <h1>Panel de Control</h1>
         <p class="subtitle">Bienvenido al sistema de administración de inventario exclusivo. Selecciona una de las acciones comerciales a continuación para comenzar.</p>
 
-        <!-- TARJETAS CONECTADAS DEL PROFE -->
         <div class="contenedor-cards">
             
             <a href="/registrar-producto" class="card">
@@ -242,7 +242,6 @@
 
         </div>
 
-        <!-- BOTÓN CERRAR SESIÓN -->
         <a href="/logout" class="btn-logout">Cerrar Sesión del Sistema</a>
     </main>
 
