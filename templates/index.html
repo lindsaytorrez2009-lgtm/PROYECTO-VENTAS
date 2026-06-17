@@ -45,12 +45,15 @@
             text-decoration: none;
         }
 
+        /* 🌟 CORREGIDO: Aumentamos tamaño, añadimos fondo blanco para evitar la imagen rota y un borde premium */
         .logo-mini {
-            height: 35px;
-            width: 35px;
+            height: 42px; /* Más grande para que no se pierda */
+            width: 42px;
             border-radius: 50%;
             object-fit: cover;
-            border: 1px solid #d4af37;
+            background-color: #ffffff; /* Fondo blanco crucial para resaltar tu logo */
+            border: 2px solid #d4af37; /* Borde dorado premium */
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
         }
 
         .logo-text {
@@ -93,19 +96,21 @@
             display: inline-block;
         }
 
+        /* 🌟 CORREGIDO: Añadimos fondo blanco interno para que luzca el vestido negro de alta costura */
         .logo-grande {
-            height: 180px;
-            width: 180px;
+            height: 190px; /* Un poquito más grandecito y estético */
+            width: 190px;
             border-radius: 50%; /* Lo hace completamente redondo */
             object-fit: cover;
+            background-color: #ffffff; /* Evita que se transparente o rompa sobre el fondo oscuro */
             border: 3px solid #d4af37; /* Borde dorado notorio */
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.3); /* Destello sutil */
-            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.4); /* Destello premium */
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
         }
 
         .logo-grande:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 35px rgba(212, 175, 55, 0.6);
+            transform: scale(1.06) rotate(1deg);
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.7);
         }
 
         h1 {
@@ -204,7 +209,7 @@
         <a href="/" class="brand-nav">
             <!-- Logo pequeño redondo en el menú -->
             <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Elegance" class="logo-mini">
-            <span class="logo-text">ELEGANCE</span>
+            <span class="logo-text">Elegancia Boutique</span>
         </a>
         <div class="user-info">
             Gestor: <span>{{ session["correo"] }}</span>
