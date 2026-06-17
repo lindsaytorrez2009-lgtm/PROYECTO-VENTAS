@@ -163,5 +163,48 @@ def ver_productos():
         productos=productos,
         buscar=buscar
     )
+# ========== AGREGAR ESTAS RUTAS NUEVAS ==========
+
+@app.route("/registro", methods=["GET"])
+def registro_form():
+    return render_template("registro.html")
+
+@app.route("/registro", methods=["POST"])
+def registro():
+    nombre = request.form.get("nombre")
+    correo = request.form.get("correo")
+    clave = request.form.get("clave")
+    
+    # Verificar si el correo ya existe
+    cursor.execute("SELECT * FROM usuarios WHERE correo = %s", (correo,))
+    existe = cursor.fetchone()
+    
+    if existe:
+        flash("Este correo ya está registrado")
+        return redirect("/registro")
+    
+    # Encriptar contraseña
+    clave_encriptada = generate_password_hash(clave)
+    
+    # Insertar nuevo usuario
+    sql = """
+    INSERT INTO usuarios(correo, clave, rol, nombre)
+    VALUES(%s, %s, %s, %s)
+    """
+    
+    valores = (correo, clave_encriptada, "Cliente", nombre)
+    
+    try:
+        cursor.execute(sql, valores)
+        conexion.commit()
+        flash("¡Registro exitoso! Ahora puedes iniciar sesión")
+        return redirect("/login")
+    except Exception as e:
+        flash(f"Error al registrar: {str(e)}")
+        return redirect("/registro")
+
+# ========== FIN DEL CÓDIGO AGREGADO ==========
+
+
 if __name__=="__main__":
     app.run(debug=True)

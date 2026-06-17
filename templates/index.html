@@ -1,54 +1,245 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elegance - Dashboard</title>
+    
+    <!-- 🌟 El logo en la pestaña del navegador -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='logo.jpg') }}" type="image/x-icon">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <title>Sistema Tienda</title>
+        body {
+            font-family: 'Playfair Display', 'Georgia', serif;
+            background: #0d0f12; /* Fondo oscuro institucional */
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-    <link rel="stylesheet"
-    href="{{ url_for('static', filename='style.css') }}">
+        /* --- BARRA DE NAVEGACIÓN (NAVBAR) --- */
+        header {
+            width: 100%;
+            padding: 15px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(13, 15, 18, 0.95);
+            border-bottom: 1px solid rgba(139, 115, 85, 0.2);
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+        }
 
+        .brand-nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-mini {
+            height: 35px;
+            width: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #d4af37;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            letter-spacing: 3px;
+            font-weight: 300;
+            color: #d4af37; /* Dorado Premium */
+            text-transform: uppercase;
+        }
+
+        .user-info {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 13px;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .user-info span {
+            color: #d4af37;
+            font-weight: 600;
+        }
+
+        /* --- CONTENEDOR PRINCIPAL --- */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 140px 20px 60px 20px; /* Espacio para el navbar */
+            background: linear-gradient(rgba(13, 15, 18, 0.85), rgba(13, 15, 18, 0.95)), 
+                        url('https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=1600') center/cover;
+            text-align: center;
+        }
+
+        /* 🌟 CONTENEDOR DEL LOGO CENTRAL GRANDE Y REDONDO 🌟 */
+        .logo-central-container {
+            margin-bottom: 25px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .logo-grande {
+            height: 180px;
+            width: 180px;
+            border-radius: 50%; /* Lo hace completamente redondo */
+            object-fit: cover;
+            border: 3px solid #d4af37; /* Borde dorado notorio */
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.3); /* Destello sutil */
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .logo-grande:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 35px rgba(212, 175, 55, 0.6);
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 300;
+            letter-spacing: 5px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            color: #ffffff;
+        }
+
+        .subtitle {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 15px;
+            opacity: 0.7;
+            margin-bottom: 45px;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        /* --- CONTENEDOR DE TARJETAS (CARDS) --- */
+        .contenedor-cards {
+            display: flex;
+            gap: 30px;
+            max-width: 900px;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            flex: 1;
+            min-width: 280px;
+            max-width: 380px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(139, 115, 85, 0.15);
+            padding: 40px 30px;
+            text-decoration: none;
+            color: #ffffff;
+            border-radius: 4px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            text-align: left;
+        }
+
+        .card:hover {
+            background: rgba(139, 115, 85, 0.05);
+            border-color: #d4af37;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .card h2 {
+            font-size: 20px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            color: #d4af37;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .card p {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.6);
+            transition: color 0.3s ease;
+        }
+
+        .card:hover p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .btn-logout {
+            display: inline-block;
+            margin-top: 40px;
+            color: #ff4d4d;
+            text-decoration: none;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: opacity 0.3s;
+            border-bottom: 1px solid transparent;
+        }
+
+        .btn-logout:hover {
+            opacity: 0.8;
+            border-bottom-color: #ff4d4d;
+        }
+    </style>
 </head>
-
 <body>
 
-    <h1>Bienvenido al Sistema</h1>
-
-    <p>
-        Usuario:
-        {{ session["correo"] }}
-    </p>
-
-    <a href="/logout">
-        Cerrar Sesión
-    </a>
-
-    <hr>
-
-    <div class="contenedor-cards">
-
-        <a href="/registrar-producto" class="card">
-
-            <h2>Registrar Productos</h2>
-
-            <p>
-                Permite agregar nuevos productos
-                al sistema.
-            </p>
-
+    <!-- BARRA DE NAVEGACIÓN -->
+    <header>
+        <a href="/" class="brand-nav">
+            <!-- Logo pequeño redondo en el menú -->
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Elegance" class="logo-mini">
+            <span class="logo-text">ELEGANCE</span>
         </a>
+        <div class="user-info">
+            Gestor: <span>{{ session["correo"] }}</span>
+        </div>
+    </header>
 
-        <a href="/ver-productos" class="card">
+    <!-- CONTENIDO CENTRAL -->
+    <main class="main-container">
+        
+        <!-- 🌟 El Logo principal súper visible, gigante y redondo 🌟 -->
+        <div class="logo-central-container">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Logo Premium" class="logo-grande">
+        </div>
 
-            <h2>Ver Productos</h2>
+        <h1>Panel de Control</h1>
+        <p class="subtitle">Bienvenido al sistema de administración de inventario exclusivo. Selecciona una de las acciones comerciales a continuación para comenzar.</p>
 
-            <p>
-                Permite visualizar todos los
-                productos registrados.
-            </p>
+        <!-- TARJETAS CONECTADAS DEL PROFE -->
+        <div class="contenedor-cards">
+            
+            <a href="/registrar-producto" class="card">
+                <h2>Registrar Productos</h2>
+                <p>Permite incorporar nuevas colecciones y artículos al sistema, asignando precios, stock e imágenes de alta definición.</p>
+            </a>
 
-        </a>
+            <a href="/ver-productos" class="card">
+                <h2>Ver Catálogo</h2>
+                <p>Visualiza y gestiona la lista completa de productos disponibles en la base de datos con actualización en tiempo real.</p>
+            </a>
 
-    </div>
+        </div>
+
+        <!-- BOTÓN CERRAR SESIÓN -->
+        <a href="/logout" class="btn-logout">Cerrar Sesión del Sistema</a>
+    </main>
 
 </body>
 </html>
