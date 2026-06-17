@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elegance - Registrar Producto</title>
     
-    <!-- 🌟 Logo en la pestaña del navegador -->
-    <link rel="shortcut icon" href="{{ url_for('static', filename='logo.jpg') }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='uploads/logo.jpg') }}" type="image/x-icon">
     
     <style>
         * {
@@ -25,6 +24,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            /* Fondo sutil degradado elegante */
             background: linear-gradient(rgba(13, 15, 18, 0.9), rgba(13, 15, 18, 0.95)), 
                         url('https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=1600') center/cover;
         }
@@ -40,24 +40,26 @@
             text-align: center;
         }
 
-        /* MINI LOGO REDONDO EN EL FORMULARIO */
-        .form-logo {
-            height: 70px;
-            width: 70px;
-            border-radius: 50%;
-            background: #ffffff;
-            border: 2px solid #d4af37;
-            object-fit: cover;
-            margin-bottom: 20px;
+        /* 🌟 CONTROL DE TAMAÑO DEL LOGO: Aquí evitamos que se haga gigante 🌟 */
+        .form-logo-real {
+            height: 100px; /* Tamaño controlado y elegante */
+            width: 100px;
+            border-radius: 50%; /* Círculo perfecto */
+            background-color: #ffffff; /* Fondo blanco para que resalte el diseño negro */
+            border: 2px solid #d4af37; /* Borde dorado premium */
+            object-fit: cover; /* Evita que se deforme */
+            display: block;
+            margin: 0 auto 20px auto; /* Centrado automático */
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
         }
 
         h1 {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 300;
             letter-spacing: 3px;
             text-transform: uppercase;
             color: #ffffff;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .back-link {
@@ -67,7 +69,7 @@
             text-decoration: none;
             font-size: 13px;
             letter-spacing: 1px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             transition: opacity 0.3s;
         }
 
@@ -76,7 +78,7 @@
             opacity: 0.9;
         }
 
-        /* MENSAJES FLASH */
+        /* Mensajes Flash de Flask */
         .alert-message {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: rgba(212, 175, 55, 0.15);
@@ -88,11 +90,10 @@
             margin-bottom: 20px;
         }
 
-        /* INPUTS ESTILIZADOS */
         form {
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 16px;
         }
 
         input {
@@ -118,7 +119,6 @@
             color: rgba(255, 255, 255, 0.4);
         }
 
-        /* BOTÓN PREMIUM */
         button {
             width: 100%;
             padding: 15px;
@@ -146,32 +146,28 @@
 <body>
 
     <div class="form-container">
-        <!-- 🌟 Mini logo circular arriba del formulario para complacer al profe -->
-       <img src="{{ url_for('static', filename='uploads/logo.jpg') }}" alt="Elegancia Boutique" class="form-logo-real">
+        <img src="{{ url_for('static', filename='uploads/logo.jpg') }}" alt="Elegancia Boutique" class="form-logo-real">
+
         <h1>Registrar Producto</h1>
         <a href="/" class="back-link">← Volver al inicio</a>
 
-        <!-- Alertas de Flask -->
         {% with mensajes = get_flashed_messages() %}
             {% if mensajes %}
                 {% for mensaje in mensajes %}
                     <div class="alert-message">{{ mensaje }}</div>
-                 Regen{% endfor %}
+                {% endfor %}
             {% endif %}
         {% endwith %}
 
-        <!-- Formulario sin enctype (ya que enviamos solo texto) -->
         <form action="/guardar" method="POST">
 
             <input type="text" name="nombre" placeholder="Nombre del producto" required>
 
-            <!-- Mantenemos el step="0.01" para permitir decimales en el precio -->
-            <input type="number" step="0.01" name="precio" placeholder="Precio (Ej: 99.99)" required>
+            <input type="number" step="0.01" name="precio" placeholder="Precio (Ej: 299.99)" required>
 
             <input type="number" name="stock" placeholder="Cantidad en Stock" required>
 
-            <!-- 🌟 REEMPLAZO DEL BOTÓN GRIS POR EL BUSCADOR DE ENLACES (URL) 🌟 -->
-            <input type="url" name="imagen_url" placeholder="Pegar link de la imagen (URL de internet)" required>
+            <input type="url" name="imagen_url" placeholder="Pegar link de la imagen (URL)" required>
 
             <button type="submit">Guardar Producto</button>
 
