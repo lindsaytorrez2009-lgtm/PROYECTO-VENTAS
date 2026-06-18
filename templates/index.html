@@ -40,27 +40,137 @@
         .logo-text { font-size: 18px; letter-spacing: 2px; color: #d4af37; text-transform: uppercase; }
         
         .main-container {
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
             background: linear-gradient(rgba(13, 15, 18, 0.85), rgba(13, 15, 18, 0.95)), 
                         url('https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=1600') center/cover;
-            padding-top: 80px;
+            padding: 120px 40px 40px 40px;
         }
-        .mensaje-vacio-box {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(139, 115, 85, 0.2);
-            padding: 40px; border-radius: 8px; max-width: 550px; text-align: center;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-        }
-        .mensaje-vacio-box h1 { font-size: 24px; letter-spacing: 2px; margin-bottom: 15px; text-transform: uppercase; }
-        .mensaje-vacio-box p { font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.6; margin-bottom: 20px; }
-        .indicador-link { color: #d4af37; text-decoration: none; font-size: 13px; border-bottom: 1px solid #d4af37; }
 
-        .btn-logout {
-            margin-top: 30px; color: #ff4d4d; text-decoration: none;
-            font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
-            border-bottom: 1px solid transparent; transition: 0.3s;
+        .grid-productos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 35px;
+            width: 100%;
+            max-width: 1100px;
+            margin-top: 20px;
         }
+        .producto-card {
+            display: flex;
+            flex-direction: column;
+            background: transparent;
+            position: relative;
+            cursor: context-menu;
+        }
+        
+        .imagen-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 135%;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            transition: border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+        
+        .imagen-wrapper img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            filter: grayscale(15%) brightness(95%);
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), filter 0.6s ease;
+            pointer-events: none;
+        }
+
+        .producto-card:hover .imagen-wrapper {
+            border-color: #d4af37;
+            box-shadow: 0 12px 25px rgba(212, 175, 55, 0.2);
+        }
+        .producto-card:hover .imagen-wrapper img {
+            transform: scale(1.05);
+            filter: grayscale(0%) brightness(100%);
+        }
+
+        .prod-categoria {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 11px; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        .prod-nombre {
+            font-size: 16px; font-weight: 400; color: #ffffff; margin-bottom: 6px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .prod-precio {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 14px; color: #d4af37; font-weight: 600;
+        }
+
+        /* 🗑️ BASURERITO FLOTANTE */
+        .btn-basurero-flotante {
+            position: absolute;
+            top: 15px; right: 15px;
+            width: 36px; height: 36px;
+            background: rgba(13, 15, 18, 0.85);
+            border: 1px solid rgba(255, 77, 77, 0.3);
+            color: #ff4d4d; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 100; opacity: 0;
+            backdrop-filter: blur(5px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: scale(0.9);
+        }
+        .producto-card:hover .btn-basurero-flotante { opacity: 1; transform: scale(1); }
+        .btn-basurero-flotante:hover { background: #ff4d4d; color: #ffffff; }
+
+        /* 🌟 MENÚ DE CLIC DERECHO INTEGRAL */
+        .custom-context-menu {
+            position: fixed;
+            background: #12151c;
+            border: 1px solid #d4af37;
+            border-radius: 6px;
+            width: 190px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            display: none;
+            flex-direction: column;
+            z-index: 3000;
+            overflow: hidden;
+            padding: 5px 0;
+        }
+        .context-option {
+            background: transparent; border: none;
+            color: #ffffff; padding: 11px 15px;
+            font-size: 13px; text-align: left; cursor: pointer;
+            font-family: sans-serif; width: 100%; transition: 0.2s;
+        }
+        .context-option:hover {
+            background: rgba(212, 175, 55, 0.15);
+            color: #d4af37;
+        }
+
+        /* MODALES */
+        .modal-editar {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(13, 15, 18, 0.85); backdrop-filter: blur(8px);
+            z-index: 2000; display: none; align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: #12151c; border: 1px solid #d4af37; padding: 35px;
+            border-radius: 8px; max-width: 400px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+        }
+        .modal-content h3 { font-size: 18px; margin-bottom: 20px; color: #d4af37; text-transform: uppercase; text-align: center; }
+        .modal-content input { width: 100%; padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; color: #ffffff; margin-bottom: 15px; }
+        .modal-actions { display: flex; gap: 10px; }
+        .btn-modal { flex: 1; padding: 12px; border: 1px solid transparent; cursor: pointer; text-transform: uppercase; font-size: 11px; transition: 0.3s; }
+        .btn-modal-guardar { background: #d4af37; color: #0d0f12; font-weight: 600; }
+        .btn-modal-cancelar { background: transparent; border-color: rgba(255,255,255,0.2); color: #ffffff; }
+
+        .mensaje-vacio-box {
+            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(139, 115, 85, 0.2);
+            padding: 40px; border-radius: 8px; max-width: 550px; text-align: center; margin: auto;
+        }
+        .btn-logout { margin-top: 40px; color: #ff4d4d; text-decoration: none; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid transparent; transition: 0.3s; }
         .btn-logout:hover { border-bottom-color: #ff4d4d; }
     </style>
 </head>
@@ -79,14 +189,129 @@
     </header>
 
     <main class="main-container">
-        <div class="mensaje-vacio-box">
-            <h1>Aún no hay nada aquí</h1>
-            <p>El panel general se encuentra limpio y listo para el despliegue del catálogo. Para comenzar a registrar productos dinámicamente, haz clic en nuestro logotipo redondo ubicado en la esquina superior izquierda.</p>
-            <a href="/registrar-producto" class="indicador-link">O haz clic aquí para registrar directo →</a>
-        </div>
+        {% if productos %}
+            <div class="grid-productos">
+                {% for producto in productos %}
+                <div class="producto-card" 
+                     data-id="{{ producto[0] }}" 
+                     data-nombre="{{ producto[1] }}" 
+                     data-precio="{{ producto[2] }}" 
+                     data-imagen="{{ producto[4] }}"
+                     oncontextmenu="abrirMenuContextual(event, this)">
+                    
+                    <div class="btn-basurero-flotante" title="Eliminar Producto" onclick="confirmarEliminar('{{ producto[0] }}')">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                        </svg>
+                    </div>
+
+                    <div class="imagen-wrapper">
+                        <img src="{{ producto[4] }}" alt="{{ producto[1] }}" onerror="this.src='https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=500';">
+                    </div>
+                    <span class="prod-categoria">Colección Premium</span>
+                    <h3 class="prod-nombre">{{ producto[1] }}</h3>
+                    <span class="prod-precio">{{ producto[2] }} Bs</span>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="mensaje-vacio-box">
+                <h1>Aún no hay nada aquí</h1>
+                <a href="/registrar-producto" style="color:#d4af37;">Registrar producto directo →</a>
+            </div>
+        {% endif %}
 
         <a href="/logout" class="btn-logout">Cerrar Sesión del Sistema</a>
     </main>
 
+    <!-- EL MENÚ CONTEXTUAL DE CLIC DERECHO INTEGRAL -->
+    <div id="menuClicDerecho" class="custom-context-menu">
+        <button type="button" class="context-option" id="optEditarDatos">✏️ Editar Datos</button>
+        <button type="button" class="context-option" id="optEditarImagen">🖼️ Cambiar Enlace URL</button>
+    </div>
+
+    <!-- MODAL 1: EDITAR TEXTO -->
+    <div id="modalTexto" class="modal-editar">
+        <div class="modal-content">
+            <h3>Editar Datos</h3>
+            <form id="formEditarTexto" method="POST" action="">
+                <input type="text" id="editNombre" name="nombre" required placeholder="Nombre">
+                <input type="number" step="0.01" id="editPrecio" name="precio" required placeholder="Precio">
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal btn-modal-cancelar" onclick="cerrarModales()">Cancelar</button>
+                    <button type="submit" class="btn-modal btn-modal-guardar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: EDITAR LINK DE IMAGEN -->
+    <div id="modalImagen" class="modal-editar">
+        <div class="modal-content">
+            <h3>Cambiar Enlace URL</h3>
+            <form id="formEditarImagen" method="POST" action="">
+                <input type="url" id="editImagenUrl" name="imagen_url" required placeholder="Pegar nueva URL de internet">
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal btn-modal-cancelar" onclick="cerrarModales()">Cancelar</button>
+                    <button type="submit" class="btn-modal btn-modal-guardar">Actualizar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const menuCtx = document.getElementById('menuClicDerecho');
+
+        function abrirMenuContextual(event, elemento) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const id = elemento.getAttribute('data-id');
+            const nombre = elemento.getAttribute('data-nombre');
+            const precio = elemento.getAttribute('data-precio');
+            const urlImg = elemento.getAttribute('data-imagen');
+
+            menuCtx.style.top = event.clientY + "px";
+            menuCtx.style.left = event.clientX + "px";
+            menuCtx.style.display = "flex";
+
+            // Opción 1: Editar Datos
+            document.getElementById('optEditarDatos').onclick = function(e) {
+                e.stopPropagation();
+                menuCtx.style.display = "none";
+                document.getElementById('formEditarTexto').action = "/editar/" + id;
+                document.getElementById('editNombre').value = nombre;
+                document.getElementById('editPrecio').value = precio;
+                document.getElementById('modalTexto').style.display = "flex";
+            };
+
+            // Opción 2: Cambiar Enlace URL
+            document.getElementById('optEditarImagen').onclick = function(e) {
+                e.stopPropagation();
+                menuCtx.style.display = "none";
+                document.getElementById('formEditarImagen').action = "/editar-imagen/" + id;
+                document.getElementById('editImagenUrl').value = urlImg;
+                document.getElementById('modalImagen').style.display = "flex";
+            };
+        }
+
+        document.addEventListener('click', function(e) {
+            if (!menuCtx.contains(e.target)) {
+                menuCtx.style.display = "none";
+            }
+        });
+
+        function cerrarModales() {
+            document.getElementById('modalTexto').style.display = "none";
+            document.getElementById('modalImagen').style.display = "none";
+        }
+
+        function confirmarEliminar(id) {
+            if (confirm("¿Seguro que deseas borrar este producto por completo?")) {
+                window.location.href = "/eliminar/" + id;
+            }
+        }
+    </script>
 </body>
 </html>

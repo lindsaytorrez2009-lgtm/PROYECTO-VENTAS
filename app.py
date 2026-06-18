@@ -1,17 +1,18 @@
 from flask import Flask, render_template, request, redirect, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from conexion import conexion, cursor
-import os
 
 app = Flask(__name__)
 app.secret_key = "123456"
 
 @app.route("/")
 def inicio():
-    # Si no hay sesión iniciada, manda al Login primero
     if "correo" not in session:
         return redirect("/login")
-    return render_template("index.html")
+    
+    cursor.execute("SELECT * FROM productos")
+    productos_guardados = cursor.fetchall()
+    return render_template("index.html", productos=productos_guardados)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -60,7 +61,6 @@ def registro():
             
     return render_template("registro.html")
 
-# 🌟 CONECTADO A TU ARCHIVO REAL: ver_productos.html
 @app.route("/registrar-producto")
 def registrar_producto():
     if "correo" not in session:
@@ -82,6 +82,74 @@ def guardar():
     conexion.commit()
     
     flash("Producto guardado correctamente")
+    return redirect("/")
+
+@app.route("/eliminar/<int:id>")
+def eliminar(id):
+    if "correo" not in session:
+        return redirect("/login")
+        
+    try:
+        sql = "DELETE FROM productos WHERE id_producto = %s"
+        cursor.execute(sql, (id,))
+    except Exception:
+        sql = "DELETE FROM productos WHERE id = %s"
+        cursor.execute(sql, (id,))
+        
+    conexion.commit()
+    flash("Producto eliminado correctamente")
+    return redirect("/")
+
+@app.route("/editar/<int:id>", methods=["POST"])
+def editar(id):
+    if "correo" not in session:
+        return redirect("/login")
+        
+    nuevo_nombre = request.form["nombre"]
+    nuevo_precio = request.form["precio"]
+    
+    try:
+        sql = "UPDATE productos SET nombre = %s, precio = %s WHERE id_producto = %s"
+        cursor.execute(sql, (nuevo_nombre, nuevo_precio, id))
+    except Exception:
+        sql = "UPDATE productos SET nombre = %s, precio = %s WHERE id = %s"
+        cursor.execute(sql, (nuevo_nombre, nuevo_precio, id))
+        
+    conexion.commit()
+    flash("Producto actualizado correctamente")
+    return redirect("/")
+
+# 🌟 RUTA ULTRA BLINDADA PARA DETECTAR ERRORES DE IMAGEN EN LA BD 🌟
+@app.route("/editar-imagen/<int:id>", methods=["POST"])
+def editar_imagen(id):
+    if "correo" not in session:
+        return redirect("/login")
+        
+    nueva_url = request.form["imagen_url"].strip()
+    print(f"\n[SISTEMA] Intentando cambiar la imagen del producto {id} a: {nueva_url}")
+    
+    # Intento 1: usando id_producto
+    try:
+        sql = "UPDATE productos SET imagen = %s WHERE id_producto = %s"
+        cursor.execute(sql, (nueva_url, id))
+        conexion.commit()
+        print("[SISTEMA] Éxito: Se actualizó usando la columna 'id_producto'")
+        flash("Imagen del producto actualizada")
+        return redirect("/")
+    except Exception as e:
+        print(f"[SISTEMA] Falló 'id_producto'. Error: {str(e)}. Intentando con columna 'id'...")
+
+    # Intento 2 de emergencia: usando id
+    try:
+        sql = "UPDATE productos SET imagen = %s WHERE id = %s"
+        cursor.execute(sql, (nueva_url, id))
+        conexion.commit()
+        print("[SISTEMA] Éxito: Se actualizó usando la columna 'id'")
+        flash("Imagen del producto actualizada")
+    except Exception as e2:
+        print(f"[SISTEMA] ¡ERROR CRÍTICO! Ninguna columna funcionó. Detalle: {str(e2)}")
+        flash("Error al actualizar la imagen en la base de datos")
+        
     return redirect("/")
 
 @app.route("/logout")
