@@ -1,26 +1,71 @@
 from flask import Flask, render_template, request, redirect, flash, session
-from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from conexion import conexion, cursor
 import os
 
 app = Flask(__name__)
-
 app.secret_key = "123456"
-
-CARPETA = "static/uploads"
-app.config["UPLOAD_FOLDER"] = CARPETA
-
-os.makedirs(CARPETA, exist_ok=True)
-
 
 @app.route("/")
 def inicio():
+    # Si no hay sesión iniciada, manda al Login primero
     if "correo" not in session:
         return redirect("/login")
-
     return render_template("index.html")
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        correo = request.form["correo"]
+        clave = request.form["clave"]
+
+        cursor.execute("SELECT * FROM usuarios WHERE correo = %s", (correo,))
+        usuario_encontrado = cursor.fetchone()
+
+        if usuario_encontrado:
+            clave_bd = usuario_encontrado[2]
+            if check_password_hash(clave_bd, clave):
+                session["id_usuario"] = usuario_encontrado[0]
+                session["correo"] = usuario_encontrado[1]
+                session["rol"] = usuario_encontrado[3]
+                return redirect("/")
+
+        flash("Correo o contraseña incorrectos")
+        return redirect("/login")
+
+    return render_template("login.html")
+
+@app.route("/registro", methods=["GET", "POST"])
+def registro():
+    if request.method == "POST":
+        correo = request.form.get("correo")
+        clave = request.form.get("clave")
+        
+        cursor.execute("SELECT * FROM usuarios WHERE correo = %s", (correo,))
+        if cursor.fetchone():
+            flash("Este correo ya está registrado")
+            return redirect("/registro")
+        
+        clave_encriptada = generate_password_hash(clave)
+        sql = "INSERT INTO usuarios(correo, clave, rol) VALUES(%s, %s, %s)"
+        
+        try:
+            cursor.execute(sql, (correo, clave_encriptada, "Cliente"))
+            conexion.commit()
+            session["correo"] = correo
+            return redirect("/")
+        except Exception as e:
+            flash(f"Error al registrar: {str(e)}")
+            return redirect("/registro")
+            
+    return render_template("registro.html")
+
+# 🌟 CONECTADO A TU ARCHIVO REAL: ver_productos.html
+@app.route("/registrar-producto")
+def registrar_producto():
+    if "correo" not in session:
+        return redirect("/login")
+    return render_template("ver_productos.html")
 
 @app.route("/guardar", methods=["POST"])
 def guardar():
@@ -30,172 +75,19 @@ def guardar():
     nombre = request.form["nombre"]
     precio = request.form["precio"]
     stock = request.form["stock"]
-    imagen = request.files["imagen"]
+    imagen_url = request.form["imagen_url"]
 
-    nombre_imagen = ""
-
-    if imagen and imagen.filename != "":
-        nombre_imagen = secure_filename(imagen.filename)
-        ruta = os.path.join(app.config["UPLOAD_FOLDER"], nombre_imagen)
-        imagen.save(ruta)
-
-    sql = """
-    INSERT INTO productos(nombre, precio, stock, imagen)
-    VALUES(%s, %s, %s, %s)
-    """
-
-    valores = (nombre, precio, stock, nombre_imagen)
-
-    cursor.execute(sql, valores)
+    sql = "INSERT INTO productos(nombre, precio, stock, imagen) VALUES(%s, %s, %s, %s)"
+    cursor.execute(sql, (nombre, precio, stock, imagen_url))
     conexion.commit()
-
+    
     flash("Producto guardado correctamente")
-
-    return redirect("/registrar-producto")
-
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        correo = request.form["correo"]
-        clave = request.form["clave"]
-
-        sql = """
-        SELECT * FROM usuarios
-        WHERE correo = %s
-        """
-
-        valores = (correo,)
-        cursor.execute(sql, valores)
-        usuario_encontrado = cursor.fetchone()
-
-        if usuario_encontrado:
-            clave_bd = usuario_encontrado[2]
-
-            if check_password_hash(clave_bd, clave):
-                session["id_usuario"] = usuario_encontrado[0]
-                session["correo"] = usuario_encontrado[1]
-                session["rol"] = usuario_encontrado[3]
-
-                flash("Bienvenido al sistema")
-                return redirect("/")
-
-        flash("Correo o contraseña incorrectos")
-        return redirect("/login")
-
-    return render_template("login.html")
-
+    return redirect("/")
 
 @app.route("/logout")
 def logout():
     session.clear()
-    flash("Sesión cerrada correctamente")
     return redirect("/login")
-
-
-# 🟢 CORREGIDO: Protección contra 'Duplicate entry' de MySQL
-@app.route("/crear-admin")
-def crear_admin():
-    correo = "admin@gmail.com"
-    
-    # Validamos primero si ya existe para evitar errores de integridad
-    cursor.execute("SELECT * FROM usuarios WHERE correo = %s", (correo,))
-    existe = cursor.fetchone()
-    
-    if existe:
-        return "El administrador ya existe en el sistema. Puedes ir a /login directamente."
-
-    clave = generate_password_hash("123456")
-    rol = "Administrador"
-
-    sql = """
-    INSERT INTO usuarios(correo, clave, rol)
-    VALUES(%s, %s, %s)
-    """
-
-    valores = (correo, clave, rol)
-
-    try:
-        cursor.execute(sql, valores)
-        conexion.commit()
-        return "Administrador creado correctamente"
-    except Exception as e:
-        return f"Error al crear administrador: {str(e)}"
-
-
-@app.route("/registrar-producto")
-def registrar_producto():
-    if "correo" not in session:
-        return redirect("/login")
-
-    return render_template("registrar_producto.html")
-
-
-@app.route("/ver-productos")
-def ver_productos():
-    if "correo" not in session:
-        return redirect("/login")
-
-    buscar = request.args.get("buscar", "")
-
-    if buscar != "":
-        sql = """
-        SELECT * FROM productos
-        WHERE nombre LIKE %s
-        """
-        valores = ("%" + buscar + "%",)
-        cursor.execute(sql, valores)
-    else:
-        sql = "SELECT * FROM productos"
-        cursor.execute(sql)
-
-    productos = cursor.fetchall()
-    return render_template(
-        "ver_productos.html",
-        productos=productos,
-        buscar=buscar
-    )
-
-
-@app.route("/registro", methods=["GET"])
-def registro_form():
-    return render_template("registro.html")
-
-
-# 🟢 CORREGIDO: Ajuste de estructura SQL para coincidir con la Base de Datos
-@app.route("/registro", methods=["POST"])
-def registro():
-    correo = request.form.get("correo")
-    clave = request.form.get("clave")
-    
-    # Verificar si el correo ya existe
-    cursor.execute("SELECT * FROM usuarios WHERE correo = %s", (correo,))
-    existe = cursor.fetchone()
-    
-    if existe:
-        flash("Este correo ya está registrado")
-        return redirect("/registro")
-    
-    # Encriptar contraseña
-    clave_encriptada = generate_password_hash(clave)
-    
-    # Quitamos la columna 'nombre' para que la consulta no falle
-    sql = """
-    INSERT INTO usuarios(correo, clave, rol)
-    VALUES(%s, %s, %s)
-    """
-    
-    valores = (correo, clave_encriptada, "Cliente")
-    
-    try:
-        cursor.execute(sql, valores)
-        conexion.commit()
-        flash("¡Registro exitoso! Ahora puedes iniciar sesión")
-        return redirect("/login")
-    except Exception as e:
-        flash(f"Error al registrar: {str(e)}")
-        return redirect("/registro")
-
 
 if __name__=="__main__":
     app.run(debug=True)

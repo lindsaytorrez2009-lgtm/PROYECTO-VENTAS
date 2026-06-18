@@ -1,103 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-
-    <title>Ver Productos</title>
-
-    <link rel="stylesheet"
-    href="{{ url_for('static', filename='style.css') }}">
-
+    <meta charset="UTF-8">
+    <title>Elegance - Registrar Producto</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Playfair Display', serif;
+            background: linear-gradient(rgba(13, 15, 18, 0.9), rgba(13, 15, 18, 0.95)), 
+                        url('https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=1600') center/cover;
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+        }
+        .form-container {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(139, 115, 85, 0.2);
+            padding: 40px; border-radius: 8px; max-width: 450px; width: 100%;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6); text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        .form-logo-real { height: 70px; width: 70px; border-radius: 50%; border: 2px solid #d4af37; object-fit: cover; margin-bottom: 20px; }
+        h1 { font-size: 24px; color: #ffffff; letter-spacing: 2px; margin-bottom: 10px; text-transform: uppercase; }
+        .back-link { display: inline-block; color: #d4af37; text-decoration: none; font-size: 13px; margin-bottom: 25px; }
+        form { display: flex; flex-direction: column; gap: 15px; }
+        input { width: 100%; padding: 14px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; color: #ffffff; }
+        input:focus { outline: none; border-color: #d4af37; }
+        button { width: 100%; padding: 15px; background: transparent; color: #d4af37; border: 1px solid #d4af37; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
+        button:hover { background: #d4af37; color: #0d0f12; font-weight: 600; }
+    </style>
 </head>
-
 <body>
 
-    <h1>Productos Registrados</h1>
+    <div class="form-container">
+        <img src="{{ url_for('static', filename='uploads/logo.jpg') }}" class="form-logo-real" alt="Logo">
+        <h1>Registrar Producto</h1>
+        <a href="/" class="back-link">← Volver al inicio</a>
 
-    <a href="/">Volver al inicio</a>
-
-    <hr>
-
-    <div class="contenedor-tabla">
-
-        <input 
-            type="text"
-            id="buscador"
-            placeholder="Buscar producto..."
-        >
-
-        <table border="1">
-
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Precio</th>
-                <th>Imagen</th>
-                <th>Stock</th>
-            </tr>
-
-            {% for producto in productos %}
-
-            <tr class="fila-producto">
-
-                <td>{{ producto[0] }}</td>
-
-                <td>{{ producto[1] }}</td>
-
-                <td>{{ producto[2] }}</td>
-
-                <td>
-
-                    {% if producto[3] %}
-
-                        <img 
-                        src="{{ url_for('static',
-                        filename='uploads/' + producto[3]) }}"
-                        width="80">
-
-                    {% else %}
-
-                        Sin imagen
-
-                    {% endif %}
-
-                </td>
-
-                <td>{{ producto[4] }}</td>
-
-            </tr>
-
-            {% endfor %}
-
-        </table>
-
+        <form action="/guardar" method="POST">
+            <input type="text" name="nombre" placeholder="Nombre del producto" required>
+            <input type="number" step="0.01" name="precio" placeholder="Precio (Ej: 299.99)" required>
+            <input type="number" name="stock" placeholder="Cantidad en Stock" required>
+            <input type="url" name="imagen_url" placeholder="Pegar link de la imagen (URL de internet)" required>
+            <button type="submit">Guardar Producto</button>
+        </form>
     </div>
-
-<script>
-
-const buscador = document.getElementById("buscador")
-
-buscador.addEventListener("keyup", function(){
-
-    const texto = buscador.value.toLowerCase()
-
-    const filas = document.querySelectorAll(".fila-producto")
-
-    filas.forEach(function(fila){
-
-        const contenido = fila.textContent.toLowerCase()
-
-        if(contenido.includes(texto)){
-            fila.style.display = ""
-        }
-        else{
-            fila.style.display = "none"
-        }
-
-    })
-
-})
-
-</script>
 
 </body>
 </html>
